@@ -1,4 +1,5 @@
 import { Application } from "pixi.js";
+import { GameScene } from "./scenes/GameScene";
 import { SCREEN_WIDTH, SCREEN_HEIGHT } from "./constants";
 import './style.css';
 
@@ -19,4 +20,17 @@ await app.init({
 // Вставляємо його в body щоб він з'явився на сторінці
 document.body.appendChild(app.canvas);
 
-console.log('PixiJS ready!');
+// Виносимо в функцію — щоб викликати і при старті і при рестарті
+function startGame(): void {
+    // Прибираємо стару сцену зі stage якщо є
+    // Це чистіше ніж скидати стан вручну всередині GameScene
+    app.stage.removeChildren();
+
+    // Створюємо нову сцену і передаємо startGame як колбек рестарт
+    const scene = new GameScene(app, startGame);
+
+    // Додаємо сцену на stage — тепер вона відображається на екрані
+    app.stage.addChild(scene);
+}
+
+startGame();
