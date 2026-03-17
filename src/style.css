@@ -1,0 +1,15 @@
+/* Прибираємо всі відступи браузера за замовчуванням */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Центруємо canvas по середині сторінки */
+body {
+    background: #0f0f1a;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
