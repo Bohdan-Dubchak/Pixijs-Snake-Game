@@ -18,8 +18,10 @@ export const TICK_INTERVAL = 150;
 // Enum — набір іменованих констант для напрямків
 // Краще ніж рядки 'up'/'down' бо TypeScript перевірить помилки
 export const Direction = {
-    UP: 'UP',
-    DOWN: 'DOWN',
-    LEFT: 'LEFT',
-    RIGHT: 'RIGHT',
-} as const
+    UP: "UP",
+    DOWN: "DOWN",
+    LEFT: "LEFT",
+    RIGHT: "RIGHT"
+} as const;
+
+export type Direction = typeof Direction[keyof typeof Direction];
