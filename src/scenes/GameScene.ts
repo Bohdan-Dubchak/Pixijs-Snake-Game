@@ -2,6 +2,7 @@ import { Application, Container } from "pixi.js";
 import { Grid } from "../entities/Grid";
 import { Snake } from "../entities/Snake";
 import { Direction, TICK_INTERVAL } from "../constants";
+import { Food } from "../entities/Food";
 
 export class GameScene extends Container {
     // Зберігаємо app щоб мати доступ до ticker і розміру екрану
@@ -17,6 +18,7 @@ export class GameScene extends Container {
     private gameLayer: Container;
     private grid: Grid;
     private snake: Snake;
+    private food: Food;
 
     // Лічильник часу — накопичуємо deltaMS і рухаємо змійку
     // тільки коли накопичилось більше TICK_INTERVAL
@@ -35,10 +37,16 @@ export class GameScene extends Container {
 
         this.grid = new Grid();
         this.snake = new Snake();
+        this.food = new Food();
 
         // Grid першим — малюється під змійкою
         this.gameLayer.addChild(this.grid);
         this.gameLayer.addChild(this.snake);
+        this.gameLayer.addChild(this.food);
+
+        // Перший спавн їжі — передаємо сегменти змійки
+        // щоб їжа не з'явилась під нею
+        this.food.spawn(this.snake.getSegments());
 
         // Підписуємось на ticker — update викликається щокадру
         this.app.ticker.add(this.update, this);
@@ -59,9 +67,24 @@ export class GameScene extends Container {
         this.snake.move();
 
         // Перевіряємо чи не вийшла за межі
-        if (this.snake.isOutOfBounds()) {
+        if (this.snake.isOutOfBounds() || this.snake.isSelfCollision()) {
             console.log('Game Over — вийшла за межі!');
-            this.app.ticker.add(this.update, this);
+            this.app.ticker.remove(this.update, this);
+            return;
+        }
+
+        // Порівнюємо позицію голови з позицією їжі
+        const head = this.snake.getHeadPosition();
+        const food = this.food.getPosition();
+
+        if (head.col === food.col && head.row === food.row) {
+            // Змійка з'їла їжу — ростемо і спавнимо нову їжу
+            this.snake.grow();
+
+            // Передаємо оновлені сегменти — змійка вже більша
+            this.food.spawn(this.snake.getSegments());
+
+            console.log('Eaten! Snake length:', this.snake.getSegments().length);
         }
     };
 
