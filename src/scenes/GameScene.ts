@@ -4,6 +4,7 @@ import { Snake } from "../entities/Snake";
 import { Direction, TICK_INTERVAL } from "../constants";
 import { Food } from "../entities/Food";
 import { ScoreDisplay } from "../ui/ScoreDisplay";
+import { GameOverScreen } from "../ui/GameOverScreen";
 
 export class GameScene extends Container {
     // Зберігаємо app щоб мати доступ до ticker і розміру екрану
@@ -80,8 +81,7 @@ export class GameScene extends Container {
 
         // Перевіряємо чи не вийшла за межі
         if (this.snake.isOutOfBounds() || this.snake.isSelfCollision()) {
-            console.log('Game Over — вийшла за межі!');
-            this.app.ticker.remove(this.update, this);
+            this.onGameOver();
             return;
         }
 
@@ -104,6 +104,24 @@ export class GameScene extends Container {
 
             console.log('Eaten! Snake length:', this.snake.getSegments().length);
         }
+    };
+
+    private onGameOver(): void {
+        // Зупиняємо ticker і клавіатуру — гра заморожується
+        this.app.ticker.remove(this.update, this)
+        window.removeEventListener('keydown', this.onKeyDown);
+
+        // GameOverScreen додаємо в uiLayer — поверх замороженої гри
+        // Передаємо рахунок і onRestart як колбек
+        const screen = new GameOverScreen(this.score, this.onRestart);
+        this.uiLayer.addChild(screen);
+    }
+
+    // При рестарті знищуємо себе і викликаємо startGame() з main.ts
+    // main.ts створить свіжу GameScene — чистіше ніж скидати стан вручну
+    private onRestart = (): void => {
+        this.destroy();
+        this.onRestartCallback();
     };
 
     // Стрілка — щоб this працював правильно в event listener
