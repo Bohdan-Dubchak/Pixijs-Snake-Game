@@ -3,9 +3,6 @@
 A classic Snake game built with PixiJS v8 and TypeScript as a learning project 
 to explore game architecture, scene management, and the PixiJS rendering engine.
 
-## Live Demo
-[Play here](#) ← сюди вставиш посилання на GitHub Pages або Vercel
-
 ## Screenshot
 ![Snake Game](./screenshot.png)
 
