@@ -20,7 +20,7 @@ export class Grid extends Container {
     private drawGrid(): void {
         const g = new Graphics();
 
-        // Малюємо лінії через rect висотою 1px — це точно працює в будь-якій версії
+        // Малюємо лінії через rect висотою 1px
         for (let col = 0; col <= GRID_WIDTH; col++) {
             g.rect(col * GRID_SIZE, 0, 1, GRID_HEIGHT * GRID_SIZE);
             g.fill({ color: 0xffffff, alpha: 0.1 });
@@ -31,6 +31,6 @@ export class Grid extends Container {
             g.fill({ color: 0xffffff, alpha: 0.1 });
         }
 
-        this.addChild(g);
+        // this.addChild(g);
     }
 }
