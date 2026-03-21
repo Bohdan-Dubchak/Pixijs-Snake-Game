@@ -3,6 +3,7 @@ import { Grid } from "../entities/Grid";
 import { Snake } from "../entities/Snake";
 import { Direction, TICK_INTERVAL } from "../constants";
 import { Food } from "../entities/Food";
+import { ScoreDisplay } from "../ui/ScoreDisplay";
 
 export class GameScene extends Container {
     // Зберігаємо app щоб мати доступ до ticker і розміру екрану
@@ -16,13 +17,17 @@ export class GameScene extends Container {
     // Шари — gameLayer для гри, uiLayer для тексту поверх
     // Додаємо поки тільки gameLayer — uiLayer прийде з ScoreDisplay
     private gameLayer: Container;
+    private uiLayer: Container;
+
     private grid: Grid;
     private snake: Snake;
     private food: Food;
+    private scoreDisplay: ScoreDisplay;
 
     // Лічильник часу — накопичуємо deltaMS і рухаємо змійку
     // тільки коли накопичилось більше TICK_INTERVAL
     private tickTimer: number = 0;
+    private score: number = 0;
 
     constructor(app: Application, onRestart: () => void) {
         super(); // обов'язково — ініціалізує Container
@@ -33,7 +38,10 @@ export class GameScene extends Container {
         // Створюємо gameLayer — всі ігрові об'єкти підуть в нього
         // Не напряму в stage — щоб легше керувати шарами
         this.gameLayer = new Container();
+        this.uiLayer = new Container();
+
         this.addChild(this.gameLayer);
+        this.addChild(this.uiLayer);
 
         this.grid = new Grid();
         this.snake = new Snake();
@@ -43,6 +51,10 @@ export class GameScene extends Container {
         this.gameLayer.addChild(this.grid);
         this.gameLayer.addChild(this.snake);
         this.gameLayer.addChild(this.food);
+
+        // UI — в uiLayer, поверх всього
+        this.scoreDisplay = new ScoreDisplay();
+        this.uiLayer.addChild(this.scoreDisplay);
 
         // Перший спавн їжі — передаємо сегменти змійки
         // щоб їжа не з'явилась під нею
@@ -78,6 +90,12 @@ export class GameScene extends Container {
         const food = this.food.getPosition();
 
         if (head.col === food.col && head.row === food.row) {
+            // +1 очок за кожну з'їдену їжу
+            this.score += 1;
+
+            // Передаємо новий рахунок у ScoreDisplay — він оновить текст
+            this.scoreDisplay.setScore(this.score);
+
             // Змійка з'їла їжу — ростемо і спавнимо нову їжу
             this.snake.grow();
 
