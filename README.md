@@ -7,7 +7,7 @@ to explore game architecture, scene management, and the PixiJS rendering engine.
 [Play here](#) ← сюди вставиш посилання на GitHub Pages або Vercel
 
 ## Screenshot
-![Snake Game](./screenshot.png) ← зроби скріншот і додай у папку
+![Snake Game](./screenshot.png)
 
 ## Tech Stack
 - **PixiJS v8** — WebGL 2D rendering engine
