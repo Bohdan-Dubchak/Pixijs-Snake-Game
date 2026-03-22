@@ -5,6 +5,7 @@ import { Direction, TICK_INTERVAL } from "../constants";
 import { Food } from "../entities/Food";
 import { ScoreDisplay } from "../ui/ScoreDisplay";
 import { GameOverScreen } from "../ui/GameOverScreen";
+import { SoundManager } from "../audio/SoundManager";
 
 export class GameScene extends Container {
     // Зберігаємо app щоб мати доступ до ticker і розміру екрану
@@ -24,6 +25,7 @@ export class GameScene extends Container {
     private snake: Snake;
     private food: Food;
     private scoreDisplay: ScoreDisplay;
+    private sound: SoundManager;
 
     // Лічильник часу — накопичуємо deltaMS і рухаємо змійку
     // тільки коли накопичилось більше TICK_INTERVAL
@@ -47,6 +49,8 @@ export class GameScene extends Container {
         this.grid = new Grid();
         this.snake = new Snake();
         this.food = new Food();
+        this.sound = new SoundManager();
+
 
         // Grid першим — малюється під змійкою
         this.gameLayer.addChild(this.grid);
@@ -63,6 +67,9 @@ export class GameScene extends Container {
 
         // Підписуємось на ticker — update викликається щокадру
         this.app.ticker.add(this.update, this);
+
+        // Тік кожного кроку — тихий фоновий звук руху
+        this.sound.playGameLoop();
 
         // Слухаємо клавіатуру
         window.addEventListener('keydown', this.onKeyDown);
@@ -102,6 +109,9 @@ export class GameScene extends Container {
             // Передаємо оновлені сегменти — змійка вже більша
             this.food.spawn(this.snake.getSegments());
 
+            // Звук з'їдання — після grow() і spawn()
+            this.sound.playEat();
+
             console.log('Eaten! Snake length:', this.snake.getSegments().length);
         }
     };
@@ -110,6 +120,9 @@ export class GameScene extends Container {
         // Зупиняємо ticker і клавіатуру — гра заморожується
         this.app.ticker.remove(this.update, this)
         window.removeEventListener('keydown', this.onKeyDown);
+
+        // Звук смерті перед показом екрану
+        this.sound.playDeath();
 
         // GameOverScreen додаємо в uiLayer — поверх замороженої гри
         // Передаємо рахунок і onRestart як колбек
@@ -120,6 +133,7 @@ export class GameScene extends Container {
     // При рестарті знищуємо себе і викликаємо startGame() з main.ts
     // main.ts створить свіжу GameScene — чистіше ніж скидати стан вручну
     private onRestart = (): void => {
+        this.sound.stopAll(); // зупиняємо всі звуки перед рестартом
         this.destroy();
         this.onRestartCallback();
     };
