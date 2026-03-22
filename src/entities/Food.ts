@@ -1,4 +1,4 @@
-import { Container, Graphics } from "pixi.js";
+import { Container, Sprite, Texture } from "pixi.js";
 import { GRID_HEIGHT, GRID_WIDTH, GRID_SIZE } from "../constants";
 import { Grid } from "./Grid";
 
@@ -10,17 +10,17 @@ interface Cell {
 export class Food extends Container {
     private col: number = 0;
     private row: number = 0;
-    private view: Graphics;
+    private view: Sprite;
 
-    constructor() {
+    // Приймаємо текстуру через конструктор —
+    // Food не знає звідки вона, просто використовує
+    constructor(appleTexture: Texture) {
         super();
 
-        this.view = new Graphics();
-
-        // Кружечок — щоб візуально відрізнялась від квадратних сегментів змійки
-        // GRID_SIZE / 2 — радіус, малюємо від центру клітинки
-        this.view.circle(GRID_SIZE / 2, GRID_SIZE / 2, GRID_SIZE / 2 - 3);
-        this.view.fill({ color: 0xff4466 });
+        this.view = new Sprite(appleTexture);
+        // Масштабуємо під розмір клітинки
+        this.view.width = GRID_SIZE;
+        this.view.height = GRID_SIZE;
 
         this.addChild(this.view);
     }

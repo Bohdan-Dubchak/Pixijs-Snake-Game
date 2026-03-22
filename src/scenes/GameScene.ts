@@ -1,4 +1,4 @@
-import { Application, Container } from "pixi.js";
+import { Application, Container, Texture } from "pixi.js";
 import { Grid } from "../entities/Grid";
 import { Snake } from "../entities/Snake";
 import { Direction, TICK_INTERVAL } from "../constants";
@@ -32,7 +32,7 @@ export class GameScene extends Container {
     private tickTimer: number = 0;
     private score: number = 0;
 
-    constructor(app: Application, onRestart: () => void) {
+    constructor(app: Application, appleTexture: Texture, onRestart: () => void) {
         super(); // обов'язково — ініціалізує Container
 
         this.app = app;
@@ -48,7 +48,7 @@ export class GameScene extends Container {
 
         this.grid = new Grid();
         this.snake = new Snake();
-        this.food = new Food();
+        this.food = new Food(appleTexture);
         this.sound = new SoundManager();
 
 
