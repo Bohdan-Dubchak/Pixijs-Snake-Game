@@ -1,7 +1,7 @@
-import { Application, Container, Texture } from "pixi.js";
+import { Application, Container, Texture, Graphics } from "pixi.js";
 import { Grid } from "../entities/Grid";
 import { Snake } from "../entities/Snake";
-import { Direction, SCREEN_WIDTH, TICK_INTERVAL } from "../constants";
+import { Direction, SCREEN_WIDTH, TICK_INTERVAL, UI_HEIGHT } from "../constants";
 import { Food } from "../entities/Food";
 import { ScoreDisplay } from "../ui/ScoreDisplay";
 import { GameOverScreen } from "../ui/GameOverScreen";
@@ -53,22 +53,33 @@ export class GameScene extends Container {
         this.food = new Food(appleTexture);
         this.sound = new SoundManager();
 
+        // Зсуваємо весь ігровий шар вниз — звільняємо місце для панелі
+        this.gameLayer.y = UI_HEIGHT;
+
 
         // Grid першим — малюється під змійкою
         this.gameLayer.addChild(this.grid);
         this.gameLayer.addChild(this.snake);
         this.gameLayer.addChild(this.food);
 
-        // Score — лівий верхній кут
+        // Score — лівий край панелі, вертикально по центру
         this.scoreDisplay = new ScoreDisplay();
+        this.scoreDisplay.x = 10;
+        this.scoreDisplay.y = UI_HEIGHT / 2 - 8; // центруємо по висоті панелі
         this.uiLayer.addChild(this.scoreDisplay);
 
         // MuteButton — правий верхній кут
         // SCREEN_WIDTH - 46 = 400 - 46 = 354px від лівого краю
         this.muteButton = new MuteButton(() => this.sound.toggleMute());
         this.muteButton.x = SCREEN_WIDTH - 46;
-        this.muteButton.y = 10;
+        this.muteButton.y = UI_HEIGHT / 2 - 18
         this.uiLayer.addChild(this.muteButton);
+
+        // Тонка лінія між панеллю і полем гри
+        const divider = new Graphics();
+        divider.rect(0, UI_HEIGHT - 1, SCREEN_WIDTH, 1);
+        divider.fill({ color: 0xffffff, alpha: 0.5 });
+        this.uiLayer.addChild(divider);
 
         this.food.spawn(this.snake.getSegments());
 
