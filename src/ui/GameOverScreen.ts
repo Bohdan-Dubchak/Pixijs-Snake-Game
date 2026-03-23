@@ -1,5 +1,5 @@
 import { Container, Graphics, Text, TextStyle } from "pixi.js";
-import { SCREEN_WIDTH, SCREEN_HEIGHT } from "../constants";
+import { SCREEN_WIDTH, SCREEN_HEIGHT, UI_HEIGHT } from "../constants";
 
 export class GameOverScreen extends Container {
     constructor(score: number, onRestart: () => void) {
@@ -8,7 +8,7 @@ export class GameOverScreen extends Container {
         // Напівпрозорий чорний фон поверх замороженої гри
         // Гравець бачить де загинув — це приємна деталь
         const overlay = new Graphics();
-        overlay.rect(0, 0, SCREEN_HEIGHT, SCREEN_WIDTH);
+        overlay.rect(0, 0, SCREEN_HEIGHT, SCREEN_WIDTH + UI_HEIGHT);
         overlay.fill({ color: 0x000000, alpha: 0.75 });
         this.addChild(overlay);
 

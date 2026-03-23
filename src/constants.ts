@@ -6,10 +6,13 @@ export const GRID_SIZE = 20;
 export const GRID_WIDTH = 20;
 export const GRID_HEIGHT = 20;
 
+// Висота панелі зверху — там будуть score і mute
+export const UI_HEIGHT = 40;
+
 // Розмір canvas в пікселях
 // Рахуємо автоматично — щоб canvas точно вміщував сітку
 export const SCREEN_WIDTH = GRID_SIZE * GRID_WIDTH;  // 20 * 20 = 400px
-export const SCREEN_HEIGHT = GRID_SIZE * GRID_HEIGHT; // 20 * 20 = 400px
+export const SCREEN_HEIGHT = GRID_SIZE * GRID_HEIGHT + UI_HEIGHT; // 20 * 20 + 40 = 404px
 
 // Час між кроками змійки у мілісекундах
 // 150мс = приблизно 6 кроків на секунду — не надто швидко і не надто повільно
