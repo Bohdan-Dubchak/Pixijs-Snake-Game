@@ -8,6 +8,9 @@ export class SoundManager {
     // loaded — флаг щоб не завантажувати звуки двічі
     private loaded: boolean = false;
 
+    // Зберігаємо стан — увімкнено чи вимкнено
+    private muted: boolean = false;
+
     constructor() {
         this.loadSounds();
     }
@@ -15,30 +18,34 @@ export class SoundManager {
     private loadSounds(): void {
         // Додаємо всі звуки одразу — sound.add() не завантажує файл одразу,
         // тільки реєструє його під іменем
-        sound.add('eat', { url: '/public/sounds/eat.mp3' });
-        sound.add('gameLoop', { url: '/public/sounds/gameLoop.wav' });
-        sound.add('death', { url: '/public/sounds/game-over.mp3' });
+        sound.add('eat', { url: '/sounds/eat.mp3' });
+        sound.add('gameLoop', { url: '/sounds/gameLoop.wav' });
+        sound.add('death', { url: 'sounds/game-over.mp3' });
 
         // preload: true — завантажуємо одразу при старті гри
         // щоб не було затримки при першому відтворенні
         this.loaded = true;
     }
+    // Викликається ОДИН РАЗ при старті гри — не кожен тік
+    // loop: true — звук грає нескінченно поки не зупинимо
+    startGameLoop(): void {
+        if (!this.loaded || this.muted) return;
+        sound.play('gameLoop', { volume: 0.3, loop: true });
+    }
+
+    // Зупиняємо тільки gameLoop — не всі звуки
+    stopGameLoop(): void {
+        sound.stop('gameLoop');
+    }
 
     // Звук з'їдання їжі
     playEat(): void {
-        if (!this.loaded) return;
+        if (!this.loaded || this.muted) return;
 
         // volume — гучність від 0 до 1
         sound.play('eat', { volume: 0.6 });
     }
 
-    // Тихий тік кожного кроку змійки
-    playGameLoop(): void {
-        if (!this.loaded) return
-
-        // Дуже тихо — 0.3, щоб не набридало
-        sound.play('gameLoop', { volume: 0.3 });
-    }
 
     // Звук смерті
     playDeath(): void {
@@ -50,5 +57,29 @@ export class SoundManager {
     // Зупинити всі звуки — наприклад при game over
     stopAll(): void {
         sound.stopAll();
+    }
+
+    // Перемикаємо стан і повертаємо новий —
+    // MuteButton використає його щоб оновити іконку
+    toggleMute(): boolean {
+        this.muted = !this.muted;
+
+        if (this.muted) {
+            // Вимикаємо — зупиняємо все що грає
+            sound.stopAll();
+        } else {
+            // Вмикаємо — відновлюємо тільки gameLoop
+            this.startGameLoop();
+        }
+        return this.muted;
+    }
+
+    isMuted(): boolean {
+        if (this.muted) {
+            sound.stopAll();
+        } else {
+            this.startGameLoop();
+        }
+        return this.muted;
     }
 }

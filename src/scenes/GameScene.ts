@@ -1,11 +1,12 @@
 import { Application, Container, Texture } from "pixi.js";
 import { Grid } from "../entities/Grid";
 import { Snake } from "../entities/Snake";
-import { Direction, TICK_INTERVAL } from "../constants";
+import { Direction, SCREEN_WIDTH, TICK_INTERVAL } from "../constants";
 import { Food } from "../entities/Food";
 import { ScoreDisplay } from "../ui/ScoreDisplay";
 import { GameOverScreen } from "../ui/GameOverScreen";
 import { SoundManager } from "../audio/SoundManager";
+import { MuteButton } from "../ui/MuteButton";
 
 export class GameScene extends Container {
     // Зберігаємо app щоб мати доступ до ticker і розміру екрану
@@ -26,6 +27,7 @@ export class GameScene extends Container {
     private food: Food;
     private scoreDisplay: ScoreDisplay;
     private sound: SoundManager;
+    private muteButton: MuteButton;
 
     // Лічильник часу — накопичуємо deltaMS і рухаємо змійку
     // тільки коли накопичилось більше TICK_INTERVAL
@@ -57,22 +59,23 @@ export class GameScene extends Container {
         this.gameLayer.addChild(this.snake);
         this.gameLayer.addChild(this.food);
 
-        // UI — в uiLayer, поверх всього
+        // Score — лівий верхній кут
         this.scoreDisplay = new ScoreDisplay();
         this.uiLayer.addChild(this.scoreDisplay);
 
-        // Перший спавн їжі — передаємо сегменти змійки
-        // щоб їжа не з'явилась під нею
+        // MuteButton — правий верхній кут
+        // SCREEN_WIDTH - 46 = 400 - 46 = 354px від лівого краю
+        this.muteButton = new MuteButton(() => this.sound.toggleMute());
+        this.muteButton.x = SCREEN_WIDTH - 46;
+        this.muteButton.y = 10;
+        this.uiLayer.addChild(this.muteButton);
+
         this.food.spawn(this.snake.getSegments());
 
-        // Підписуємось на ticker — update викликається щокадру
         this.app.ticker.add(this.update, this);
-
-        // Тік кожного кроку — тихий фоновий звук руху
-        this.sound.playGameLoop();
-
-        // Слухаємо клавіатуру
         window.addEventListener('keydown', this.onKeyDown);
+
+        this.sound.startGameLoop();
     }
 
     // Стрілка щоб this всередині завжди вказував на GameScene
@@ -121,7 +124,8 @@ export class GameScene extends Container {
         this.app.ticker.remove(this.update, this)
         window.removeEventListener('keydown', this.onKeyDown);
 
-        // Звук смерті перед показом екрану
+        // Зупиняємо gameLoop перед звуком смерті
+        this.sound.stopGameLoop();
         this.sound.playDeath();
 
         // GameOverScreen додаємо в uiLayer — поверх замороженої гри
@@ -161,6 +165,8 @@ export class GameScene extends Container {
     // destroy() — викликається коли сцена знищується
     // Важливо прибрати всі підписки щоб не було memory leak
     destroy(): void {
-        super.destroy(); // обов'язково — PixiJS прибирає дочірні об'єкт
+        this.app.ticker.remove(this.update, this);
+        window.removeEventListener('keydown', this.onKeyDown);
+        super.destroy();
     }
 }
