@@ -1,12 +1,13 @@
 import { Application, Container, Texture, Graphics } from "pixi.js";
 import { Grid } from "../entities/Grid";
 import { Snake } from "../entities/Snake";
-import { Direction, SCREEN_WIDTH, TICK_INTERVAL, UI_HEIGHT } from "../constants";
+import { Direction, SCREEN_WIDTH, TICK_INTERVAL, UI_HEIGHT, SCORE_PER_LEVEL, SPEED_INCREASE, SCREEN_HEIGHT, MIN_TICK_INTERVAL } from "../constants";
 import { Food } from "../entities/Food";
 import { ScoreDisplay } from "../ui/ScoreDisplay";
 import { GameOverScreen } from "../ui/GameOverScreen";
 import { SoundManager } from "../audio/SoundManager";
 import { MuteButton } from "../ui/MuteButton";
+import { LevelDisplay } from "../ui/LevelDisplay";
 
 export class GameScene extends Container {
     // Зберігаємо app щоб мати доступ до ticker і розміру екрану
@@ -28,11 +29,16 @@ export class GameScene extends Container {
     private scoreDisplay: ScoreDisplay;
     private sound: SoundManager;
     private muteButton: MuteButton;
+    private levelDisplay: LevelDisplay;
 
     // Лічильник часу — накопичуємо deltaMS і рухаємо змійку
     // тільки коли накопичилось більше TICK_INTERVAL
     private tickTimer: number = 0;
     private score: number = 0;
+    private level: number = 1;
+
+    // Поточний інтервал — змінюється з кожним рівнем
+    private currentTickInterval: number = TICK_INTERVAL;
 
     constructor(app: Application, appleTexture: Texture, onRestart: () => void) {
         super(); // обов'язково — ініціалізує Container
@@ -56,7 +62,6 @@ export class GameScene extends Container {
         // Зсуваємо весь ігровий шар вниз — звільняємо місце для панелі
         this.gameLayer.y = UI_HEIGHT;
 
-
         // Grid першим — малюється під змійкою
         this.gameLayer.addChild(this.grid);
         this.gameLayer.addChild(this.snake);
@@ -67,6 +72,12 @@ export class GameScene extends Container {
         this.scoreDisplay.x = 10;
         this.scoreDisplay.y = UI_HEIGHT / 2 - 8; // центруємо по висоті панелі
         this.uiLayer.addChild(this.scoreDisplay);
+
+        // Level — по центру панелі
+        this.levelDisplay = new LevelDisplay();
+        this.levelDisplay.x = SCREEN_WIDTH / 2 - 30;
+        this.levelDisplay.y = UI_HEIGHT / 2 - 8;
+        this.uiLayer.addChild(this.levelDisplay);
 
         // MuteButton — правий верхній кут
         // SCREEN_WIDTH - 46 = 400 - 46 = 354px від лівого краю
@@ -94,9 +105,10 @@ export class GameScene extends Container {
         // Накопичуємо час
         this.tickTimer += ticker.deltaMS;
 
-        // Рухаємо змійку тільки коли пройшло TICK_INTERVAL мс
-        if (this.tickTimer < TICK_INTERVAL) return;
+        // Використовуємо currentTickInterval замість константи
+        if (this.tickTimer < this.currentTickInterval) return
         this.tickTimer = 0;
+
 
         this.snake.move();
 
@@ -126,9 +138,28 @@ export class GameScene extends Container {
             // Звук з'їдання — після grow() і spawn()
             this.sound.playEat();
 
+            // Перевіряємо чи треба підвищити рівень
+            this.checkLevelUp();
+
             console.log('Eaten! Snake length:', this.snake.getSegments().length);
         }
     };
+
+    private checkLevelUp(): void {
+        // Новий рівень = скільки разів score ділиться на SCORE_PER_LEVEL
+        // score=5 → level=2, score=10 → level=3 і т.д.
+        const newLevel = Math.floor(this.score / SCORE_PER_LEVEL) + 1;
+
+        // Якщо рівень змінився — оновлюємо
+        if (newLevel > this.level) {
+            this.level = newLevel;
+            this.levelDisplay.setLevel(this.level);
+        }
+
+        // Зменшуємо інтервал — але не нижче мінімуму
+        this.currentTickInterval = Math.max(MIN_TICK_INTERVAL, TICK_INTERVAL - (this.level - 1) * SPEED_INCREASE);
+        console.log(`Level ${this.level}! Tick: ${this.currentTickInterval}ms`);
+    }
 
     private onGameOver(): void {
         // Зупиняємо ticker і клавіатуру — гра заморожується
