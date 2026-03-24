@@ -18,6 +18,16 @@ export const SCREEN_HEIGHT = GRID_SIZE * GRID_HEIGHT + UI_HEIGHT; // 20 * 20 + 4
 // 150мс = приблизно 6 кроків на секунду — не надто швидко і не надто повільно
 export const TICK_INTERVAL = 150;
 
+// Мінімальний інтервал — швидше не стає
+// 60мс = дуже швидко, майже неможливо
+export const MIN_TICK_INTERVAL = 60;
+
+// Кожні скільки очок збільшується рівень
+export const SCORE_PER_LEVEL = 5;
+
+// На скільки мс зменшується інтервал за кожен рівень
+export const SPEED_INCREASE = 10;
+
 // Enum — набір іменованих констант для напрямків
 // Краще ніж рядки 'up'/'down' бо TypeScript перевірить помилки
 export const Direction = {
