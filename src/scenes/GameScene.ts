@@ -8,6 +8,7 @@ import { GameOverScreen } from "../ui/GameOverScreen";
 import { SoundManager } from "../audio/SoundManager";
 import { MuteButton } from "../ui/MuteButton";
 import { LevelDisplay } from "../ui/LevelDisplay";
+import { PauseScreen } from "../ui/PauseScreen";
 
 export class GameScene extends Container {
     // Зберігаємо app щоб мати доступ до ticker і розміру екрану
@@ -31,14 +32,19 @@ export class GameScene extends Container {
     private muteButton: MuteButton;
     private levelDisplay: LevelDisplay;
 
+    // Зберігаємо екран паузи щоб потім його прибрати
+    private pauseScreen: PauseScreen | null = null;
+
     // Лічильник часу — накопичуємо deltaMS і рухаємо змійку
     // тільки коли накопичилось більше TICK_INTERVAL
     private tickTimer: number = 0;
     private score: number = 0;
     private level: number = 1;
-
     // Поточний інтервал — змінюється з кожним рівнем
     private currentTickInterval: number = TICK_INTERVAL;
+
+    // Прапорець паузи
+    private paused: boolean = false;
 
     constructor(app: Application, appleTexture: Texture, onRestart: () => void) {
         super(); // обов'язково — ініціалізує Container
@@ -102,9 +108,11 @@ export class GameScene extends Container {
 
     // Стрілка щоб this всередині завжди вказував на GameScene
     private update = (ticker: { deltaMS: number }): void => {
+        // Якщо пауза — нічого не робимо
+        if (this.paused) return;
+
         // Накопичуємо час
         this.tickTimer += ticker.deltaMS;
-
         // Використовуємо currentTickInterval замість константи
         if (this.tickTimer < this.currentTickInterval) return
         this.tickTimer = 0;
@@ -144,6 +152,24 @@ export class GameScene extends Container {
             console.log('Eaten! Snake length:', this.snake.getSegments().length);
         }
     };
+
+    private togglePause(): void {
+        this.paused = !this.paused;
+
+        if (this.paused) {
+            // Ставимо на паузу — показуємо екран і зупиняємо музику
+            this.pauseScreen = new PauseScreen();
+            this.uiLayer.addChild(this.pauseScreen);
+            this.sound.pauseGameLoop();
+        } else {
+            if (this.pauseScreen) {
+                this.uiLayer.removeChild(this.pauseScreen);
+                this.pauseScreen.destroy();
+                this.pauseScreen = null;
+            }
+            this.sound.startGameLoop();
+        }
+    }
 
     private checkLevelUp(): void {
         // Новий рівень = скільки разів score ділиться на SCORE_PER_LEVEL
@@ -186,6 +212,15 @@ export class GameScene extends Container {
 
     // Стрілка — щоб this працював правильно в event listener
     private onKeyDown = (e: KeyboardEvent): void => {
+        // Пауза — P або Escape
+        if (e.code === 'KeyP' || e.code === 'Escape') {
+            this.togglePause();
+            return;
+        }
+
+        // Рух — тільки якщо не на паузі
+        if (this.paused) return;
+
         const map: Record<string, Direction> = {
             ArrowUp: Direction.UP,
             ArrowDown: Direction.DOWN,
