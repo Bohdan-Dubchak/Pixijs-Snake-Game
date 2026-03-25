@@ -3,6 +3,7 @@
 // Інші класи не знають звідки звуки — просто викликають playEat(), playTick() і т.д.
 
 import { sound } from "@pixi/sound";
+import { tilingBit } from "pixi.js";
 
 export class SoundManager {
     // loaded — флаг щоб не завантажувати звуки двічі
@@ -81,5 +82,17 @@ export class SoundManager {
             this.startGameLoop();
         }
         return this.muted;
+    }
+
+    // Ставимо музику на паузу — не зупиняємо, щоб продовжити з того місця
+    pauseGameLoop(): void {
+        sound.pause('gameLoop');
+    };
+
+    // Відновлюємо музику з того місця де зупинились
+    resumeGameLoop(): void {
+        if (!this.muted) {
+            sound.remove('gameLoop')
+        }
     }
 }
