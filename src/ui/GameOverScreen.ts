@@ -5,10 +5,17 @@ export class GameOverScreen extends Container {
     constructor(score: number, onRestart: () => void) {
         super();
 
+        // Зберігаємо рекорд у localStorage
+        const prevBest = parseInt(localStorage.getItem('snake-best-score') ?? '0');
+        const isNewBest = score > prevBest;
+        if (isNewBest) {
+            localStorage.setItem('snake-best-score', String(score));
+        }
+
         // Напівпрозорий чорний фон поверх замороженої гри
         // Гравець бачить де загинув — це приємна деталь
         const overlay = new Graphics();
-        overlay.rect(0, 0, SCREEN_HEIGHT, SCREEN_WIDTH + UI_HEIGHT);
+        overlay.rect(0, 0, SCREEN_HEIGHT, SCREEN_HEIGHT + UI_HEIGHT);
         overlay.fill({ color: 0x000000, alpha: 0.75 });
         this.addChild(overlay);
 
@@ -29,7 +36,7 @@ export class GameOverScreen extends Container {
         // Так легше центрувати — просто ставимо x/y по центру екрану
         title.anchor.set(0.5);
         title.x = SCREEN_WIDTH / 2;
-        title.y = SCREEN_HEIGHT / 2 - 50;
+        title.y = SCREEN_HEIGHT / 2 - 70;
         this.addChild(title);
 
         // Фінальний рахунок
@@ -47,6 +54,23 @@ export class GameOverScreen extends Container {
         scoreText.anchor.set(0.5);
         scoreText.position.set(scoreText.x = SCREEN_WIDTH / 2, scoreText.y = SCREEN_HEIGHT / 2 + 10);
         this.addChild(scoreText);
+
+        // Рекорд — жовтий якщо новий рекорд
+        const bestStyle = new TextStyle({
+            fontFamily: 'monospace',
+            fontSize: 16,
+            fill: isNewBest ? 0xffdd44 : 0xaaaaaa,
+        });
+
+        const bestText = new Text({
+            text: isNewBest ? 'NEW BEST!' : `BEST: ${prevBest}`,
+            style: bestStyle,
+        });
+
+        bestText.anchor.set(0.5);
+        bestText.x = SCREEN_WIDTH / 2;
+        bestText.y = SCREEN_HEIGHT / 2 + 35;
+        this.addChild(bestText);
 
         // Підказка для гравця
         const hintStyle = new TextStyle({

@@ -3,7 +3,6 @@
 // Інші класи не знають звідки звуки — просто викликають playEat(), playTick() і т.д.
 
 import { sound } from "@pixi/sound";
-import { tilingBit } from "pixi.js";
 
 export class SoundManager {
     // loaded — флаг щоб не завантажувати звуки двічі
@@ -19,9 +18,17 @@ export class SoundManager {
     private loadSounds(): void {
         // Додаємо всі звуки одразу — sound.add() не завантажує файл одразу,
         // тільки реєструє його під іменем
-        sound.add('eat', { url: '/sounds/eat.mp3' });
-        sound.add('gameLoop', { url: '/sounds/gameLoop.wav' });
-        sound.add('death', { url: 'sounds/game-over.mp3' });
+        if (!sound.exists('eat')) {
+            sound.add('eat', { url: '/sounds/eat.mp3' });
+        }
+
+        if (!sound.exists('gameLoop')) {
+            sound.add('gameLoop', { url: '/sounds/gameLoop.wav' });
+        }
+
+        if (!sound.exists('death')) {
+            sound.add('death', { url: 'sounds/game-over.mp3' });
+        }
 
         // preload: true — завантажуємо одразу при старті гри
         // щоб не було затримки при першому відтворенні
@@ -31,6 +38,8 @@ export class SoundManager {
     // loop: true — звук грає нескінченно поки не зупинимо
     startGameLoop(): void {
         if (!this.loaded || this.muted) return;
+        // Зупиняємо перед запуском — щоб не накладалос
+        sound.stop('gameLoop');
         sound.play('gameLoop', { volume: 0.3, loop: true });
     }
 
@@ -76,11 +85,6 @@ export class SoundManager {
     }
 
     isMuted(): boolean {
-        if (this.muted) {
-            sound.stopAll();
-        } else {
-            this.startGameLoop();
-        }
         return this.muted;
     }
 
