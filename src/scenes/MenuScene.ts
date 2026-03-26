@@ -126,5 +126,22 @@ export class MenuScene extends Container {
         };
 
         window.addEventListener('keydown', onKey);
+
+
+        const gamepadHintStyle = new TextStyle({
+            fontFamily: 'monospace',
+            fontSize: 16,
+            fill: 0x555577
+        });
+
+        const gamepadHint = new Text({
+            text: 'GAMEPAD SUPPORTED',
+            style: gamepadHintStyle
+        });
+
+        gamepadHint.anchor.set(0.5);
+        gamepadHint.x = SCREEN_WIDTH / 2;
+        gamepadHint.y = SCREEN_HEIGHT / 2 + 120;
+        this.addChild(gamepadHint);
     }
 }

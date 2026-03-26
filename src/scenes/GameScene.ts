@@ -1,7 +1,7 @@
 import { Application, Container, Texture, Graphics } from "pixi.js";
 import { Grid } from "../entities/Grid";
 import { Snake } from "../entities/Snake";
-import { Direction, SCREEN_WIDTH, TICK_INTERVAL, UI_HEIGHT, SCORE_PER_LEVEL, SPEED_INCREASE, SCREEN_HEIGHT, MIN_TICK_INTERVAL } from "../constants";
+import { Direction, SCREEN_WIDTH, TICK_INTERVAL, UI_HEIGHT, SCORE_PER_LEVEL, SPEED_INCREASE, MIN_TICK_INTERVAL } from "../constants";
 import { Food } from "../entities/Food";
 import { ScoreDisplay } from "../ui/ScoreDisplay";
 import { GameOverScreen } from "../ui/GameOverScreen";
@@ -9,6 +9,7 @@ import { SoundManager } from "../audio/SoundManager";
 import { MuteButton } from "../ui/MuteButton";
 import { LevelDisplay } from "../ui/LevelDisplay";
 import { PauseScreen } from "../ui/PauseScreen";
+import { GamepadController } from "../input/GamepadController";
 
 export class GameScene extends Container {
     // Зберігаємо app щоб мати доступ до ticker і розміру екрану
@@ -31,6 +32,7 @@ export class GameScene extends Container {
     private sound: SoundManager;
     private muteButton: MuteButton;
     private levelDisplay: LevelDisplay;
+    private gamePad: GamepadController;
 
     // Зберігаємо екран паузи щоб потім його прибрати
     private pauseScreen: PauseScreen | null = null;
@@ -92,6 +94,12 @@ export class GameScene extends Container {
         this.muteButton.y = UI_HEIGHT / 2 - 18
         this.uiLayer.addChild(this.muteButton);
 
+        // Створюємо геймпад — передаємо ті самі методи що і клавіатура
+        this.gamePad = new GamepadController(
+            (dir) => this.snake.setDirection(dir), // той самий метод що в onKeyDown
+            () => this.togglePause()
+        )
+
         // Тонка лінія між панеллю і полем гри
         const divider = new Graphics();
         divider.rect(0, UI_HEIGHT - 1, SCREEN_WIDTH, 1);
@@ -108,6 +116,9 @@ export class GameScene extends Container {
 
     // Стрілка щоб this всередині завжди вказував на GameScene
     private update = (ticker: { deltaMS: number }): void => {
+        // Опитуємо геймпад кожен кадр — до перевірки паузи
+        this.gamePad.update();
+
         // Якщо пауза — нічого не робимо
         if (this.paused) return;
 
