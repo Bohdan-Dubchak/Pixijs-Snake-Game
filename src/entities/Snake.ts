@@ -1,4 +1,4 @@
-import { Container, Graphics } from "pixi.js";
+import {Container, Sprite, Texture} from "pixi.js";
 import { GRID_SIZE, GRID_HEIGHT, GRID_WIDTH, Direction } from "../constants";
 import { Grid } from "./Grid";
 
@@ -11,7 +11,7 @@ interface Cell {
 
 export class Snake extends Container {
     // Масив всіх сегментів — [0] голова, останній — хвіст
-    // Зберігаємо у клітинках бо так легше рахувати колізії
+    // Зберігаємо у клітинках, бо так легше рахувати колізії
     private segments: Cell[] = [
         { col: 12, row: 10 }, // голова
         { col: 11, row: 10 }, // тіло
@@ -20,7 +20,7 @@ export class Snake extends Container {
 
     private direction: Direction = Direction.RIGHT;
     // nextDirection — окремо від direction щоб не втратити поворот
-    // між тіками якщо гравець натиснув клавішу
+    // між тітками якщо гравець натиснув клавішу
     private nextDirection: Direction = Direction.RIGHT;
 
     // true — наступний крок не видаляти хвіст, змійка росте
@@ -28,23 +28,30 @@ export class Snake extends Container {
 
     // Graphics об'єкти — по одному на кожен сегмент
     // індекс тут = індекс в segments[]
-    private segmentViews: Graphics[] = [];
+    private segmentViews: Sprite[] = [];
 
-    constructor() {
+    private headTexture: Texture;
+    private bodyTexture: Texture;
+
+    // Тепер приймає дві текстури замість нуля аргументі
+    constructor(headTexture: Texture, bodyTexture: Texture) {
         super();
 
+        this.headTexture = headTexture;
+        this.bodyTexture = bodyTexture;
+
         // Створюємо Graphics для кожного початкового сегмента
-        for (const _ of this.segments) {
-            const g = this.createSegmentView();
-            this.segmentViews.push(g); // зберігаємо щоб переміщати
-            this.addChild(g); // додаємо щоб малювалось
+        for (let i = 0; i < this.segments.length; i++) {
+            const sprite = this.createSprite(i === 0);
+            this.segmentViews.push(sprite); // зберігаємо, щоб переміщати
+            this.addChild(sprite); // додаємо, щоб малювалось
         }
 
         // Ставимо на початкові позиції
         this.redraw();
     }
 
-    // Викликається з GameScene по таймеру — не щокадру
+    // Викликається з GameScene по таймеру — не що кадру
     move(): void {
         // Фіксуємо напрямок тільки тут —
         // не можна змінити напрямок двічі за один тік
@@ -64,9 +71,9 @@ export class Snake extends Container {
         if (this.shouldGrow) {
             // Ріст — хвіст не видаляємо, додаємо новий Graphics
             this.shouldGrow = false;
-            const g = this.createSegmentView();
-            this.segmentViews.push(g);
-            this.addChild(g);
+            const sprite = this.createSprite(false);
+            this.segmentViews.push(sprite);
+            this.addChild(sprite);
         } else {
             // Звичайний рух — видаляємо хвіст
             // Змійка "переміщується" а не росте
@@ -130,13 +137,27 @@ export class Snake extends Container {
     private redraw(): void {
         this.segments.forEach((seg, i) => {
             const { x, y } = Grid.cellToPixel(seg.col, seg.row);
-            const view = this.segmentViews[i];
-            view.x = x;
-            view.y = y;
+            const sprite = this.segmentViews[i];
 
-            // Голова біліша — легше бачити напрямок
-            view.tint = i === 0 ? 0xffffff : 0x44ff88;
+            // anchor 0.5 — обертаємо навколо центру
+            sprite.anchor.set(0.5);
+            sprite.x = x + GRID_SIZE / 2;
+            sprite.y = y + GRID_SIZE / 2;
+
+            sprite.rotation = i === 0 ? this.getHeadRotation() : 0;
         });
+    }
+
+    // Кут повороту в радіанах для кожного напрямку
+    // Спрайт голови дивиться вправо за замовчуванням —
+    // тому RIGHT = 0, інші відносно нього
+    private getHeadRotation(): number {
+        switch (this.direction) {
+            case Direction.UP: return 0;
+            case  Direction.RIGHT: return  Math.PI / 2;
+            case  Direction.DOWN: return  Math.PI;
+            case  Direction.LEFT: return  -Math.PI / 2;
+        }
     }
 
     private getDeltaCol(): number {
@@ -151,11 +172,10 @@ export class Snake extends Container {
         return 0;
     }
 
-    private createSegmentView(): Graphics {
-        const g = new Graphics();
-        // Відступ 2px — щоб між сегментами був зазор і сітка просвічувала
-        g.roundRect(2, 2, GRID_SIZE - 4, GRID_SIZE - 4, 4);
-        g.fill({ color: 0x44ff88 });
-        return g;
+    private createSprite(isHead: boolean): Sprite {
+        const sprite = new Sprite(isHead ? this.headTexture : this.bodyTexture);
+        sprite.width  = GRID_SIZE;
+        sprite.height = GRID_SIZE;
+        return sprite;
     }
 }

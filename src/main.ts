@@ -20,7 +20,7 @@ await app.init({
 });
 
 // app.canvas — звичайний HTML <canvas> елемент
-// Вставляємо його в body щоб він з'явився на сторінці
+// Вставляємо його в body, щоб він з'явився на сторінці
 document.body.appendChild(app.canvas);
 
 // Чекаємо завантаження шрифту
@@ -28,9 +28,12 @@ await  document.fonts.load("40px grunge");
 await  document.fonts.load("20px stormax");
 await document.fonts.ready;
 
-// Завантажуємо тільки яблуко — одна текстура, просто і чисто
-const appleTexture = await Assets.load<Texture>('/images/apple.png');
-
+// Завантажуємо всі текстури паралельно
+const [appleTexture, headTexture, bodyTexture] = await Promise.all([
+    Assets.load<Texture>('/images/apple.png'),
+    Assets.load<Texture>('/images/snake_head.png'),
+    Assets.load<Texture>('/images/snake_body.png'),
+])
 // Показуємо меню
 function showMenu(): void {
     app.stage.removeChildren();
@@ -40,14 +43,14 @@ function showMenu(): void {
 
 
 
-// Виносимо в функцію — щоб викликати і при старті і при рестарті
+// Виносимо в функцію — щоб викликати, при старті, при рестарті
 function startGame(): void {
     // Прибираємо стару сцену зі stage якщо є
     // Це чистіше ніж скидати стан вручну всередині GameScene
     app.stage.removeChildren();
 
     // Створюємо нову сцену і передаємо startGame як колбек рестарт
-    const scene = new GameScene(app, appleTexture, showMenu);
+    const scene = new GameScene(app, appleTexture, headTexture, bodyTexture, showMenu);
 
     // Додаємо сцену на stage — тепер вона відображається на екрані
     app.stage.addChild(scene);

@@ -48,7 +48,7 @@ export class GameScene extends Container {
     // Прапорець паузи
     private paused: boolean = false;
 
-    constructor(app: Application, appleTexture: Texture, onRestart: () => void) {
+    constructor(app: Application, appleTexture: Texture, headTexture: Texture, bodyTexture: Texture, onRestart: () => void) {
         super(); // обов'язково — ініціалізує Container
 
         this.app = app;
@@ -63,7 +63,7 @@ export class GameScene extends Container {
         this.addChild(this.uiLayer);
 
         this.grid = new Grid();
-        this.snake = new Snake();
+        this.snake = new Snake(headTexture, bodyTexture);
         this.food = new Food(appleTexture);
         this.sound = new SoundManager();
 
@@ -114,7 +114,7 @@ export class GameScene extends Container {
         this.sound.startGameLoop();
     }
 
-    // Стрілка щоб this всередині завжди вказував на GameScene
+    // Стрілка, щоб this всередині завжди вказував на GameScene
     private update = (ticker: { deltaMS: number }): void => {
         // Опитуємо геймпад кожен кадр — до перевірки паузи
         this.gamePad.update();
