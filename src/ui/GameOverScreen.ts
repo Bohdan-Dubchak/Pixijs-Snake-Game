@@ -21,7 +21,7 @@ export class GameOverScreen extends Container {
 
         // GAME OVER — великий червоний заголовок
         const titleStyle = new TextStyle({
-            fontFamily: 'monospace',
+            fontFamily: 'grunge',
             fontSize: 36,
             fill: 0xff4466,
             fontWeight: 'bold'
@@ -52,7 +52,7 @@ export class GameOverScreen extends Container {
         });
 
         scoreText.anchor.set(0.5);
-        scoreText.position.set(scoreText.x = SCREEN_WIDTH / 2, scoreText.y = SCREEN_HEIGHT / 2 + 10);
+        scoreText.position.set(scoreText.x = SCREEN_WIDTH / 2, scoreText.y = SCREEN_HEIGHT / 2 );
         this.addChild(scoreText);
 
         // Рекорд — жовтий якщо новий рекорд

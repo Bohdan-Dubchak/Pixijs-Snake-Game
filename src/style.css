@@ -13,3 +13,13 @@ body {
     align-items: center;
     height: 100vh;
 }
+
+@font-face {
+    font-family: 'grunge';
+    src: url("../public/font/Head-Capital.otf") format('opentype');
+}
+
+@font-face {
+    font-family: "stormax";
+    src: url("../public/font/Craft.otf") format('opentype');
+}

@@ -13,7 +13,7 @@ export class MenuScene extends Container {
 
         // Назва гри
         const titleStyle = new TextStyle({
-            fontFamily: 'monospace',
+            fontFamily: 'grunge',
             fontSize: 42,
             fill: 0x44ff88,
             fontWeight: 'bold'
@@ -32,7 +32,7 @@ export class MenuScene extends Container {
         // Рекорд з localStorage
         const bestScore = localStorage.getItem('snake-best-score') ?? '0';
         const bestStyle = new TextStyle({
-            fontFamily: 'monospace',
+            fontFamily: 'stormax',
             fontSize: 16,
             fill: 0xaaaaaa
         });
@@ -61,7 +61,7 @@ export class MenuScene extends Container {
 
         // Текст кнопки
         const btnStyle = new TextStyle({
-            fontFamily: 'monospace',
+            fontFamily: 'montserrat',
             fontSize: 22,
             fill: 0x44ff88,
             fontWeight: 'bold'
@@ -102,7 +102,7 @@ export class MenuScene extends Container {
 
         // Підказка клавіатури
         const hintStyle = new TextStyle({
-            fontFamily: 'monospace',
+            fontFamily: 'stormax',
             fontSize: 13,
             fill: 0x555577
         });

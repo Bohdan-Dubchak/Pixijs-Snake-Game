@@ -15,7 +15,7 @@ export class PauseScreen extends Container {
 
         // Напис PAUSED по центру
         const titleStyle = new TextStyle({
-            fontFamily: 'monospace',
+            fontFamily: 'grunge',
             fontSize: 36,
             fill: 0xffffff,
             fontWeight: 'bold'

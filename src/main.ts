@@ -14,12 +14,19 @@ await app.init({
     width: SCREEN_WIDTH,
     height: SCREEN_HEIGHT,
     background: '#1a1a2e',
-    antialias: false
+    antialias: false,
+    resolution: window.devicePixelRatio, // погана ідея для гри сильно навантажує GPU, падає FPS
+    autoDensity: true
 });
 
 // app.canvas — звичайний HTML <canvas> елемент
 // Вставляємо його в body щоб він з'явився на сторінці
 document.body.appendChild(app.canvas);
+
+// Чекаємо завантаження шрифту
+await  document.fonts.load("40px grunge");
+await  document.fonts.load("20px stormax");
+await document.fonts.ready;
 
 // Завантажуємо тільки яблуко — одна текстура, просто і чисто
 const appleTexture = await Assets.load<Texture>('/images/apple.png');
