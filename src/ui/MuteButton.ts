@@ -27,7 +27,7 @@ export class MuteButton extends Container {
         });
 
         this.muteText.x = 8;
-        this.muteText.y = 6;
+        this.muteText.y = 11;
         this.addChild(this.muteText);
 
         // Робимо кнопку інтерактивною
