@@ -22,7 +22,7 @@ export class ScoreDisplay extends Container {
 
         // Відступ від лівого верхнього кута
         this.scoreText.x = 10;
-        this.scoreText.y = 10;
+        // this.scoreText.y = 10;
 
         this.addChild(this.scoreText);
     }
