@@ -31,6 +31,5 @@ export class Grid extends Container {
             g.fill({ color: 0xffffff, alpha: 0.1 });
         }
 
-        // this.addChild(g);
     }
 }
