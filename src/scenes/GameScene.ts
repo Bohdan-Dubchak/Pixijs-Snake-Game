@@ -159,8 +159,6 @@ export class GameScene extends Container {
 
             // Перевіряємо чи треба підвищити рівень
             this.checkLevelUp();
-
-            console.log('Eaten! Snake length:', this.snake.getSegments().length);
         }
     };
 
@@ -195,7 +193,6 @@ export class GameScene extends Container {
 
         // Зменшуємо інтервал — але не нижче мінімуму
         this.currentTickInterval = Math.max(MIN_TICK_INTERVAL, TICK_INTERVAL - (this.level - 1) * SPEED_INCREASE);
-        console.log(`Level ${this.level}! Tick: ${this.currentTickInterval}ms`);
     }
 
     private onGameOver(): void {
