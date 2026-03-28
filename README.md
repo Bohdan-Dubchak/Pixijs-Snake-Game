@@ -3,8 +3,10 @@
 A classic Snake game built with PixiJS v8 and TypeScript as a learning project
 to explore game architecture, scene management, and the PixiJS rendering engine.
 
-## Screenshot
+## Screenshot v1.0.0
 ![Snake Game](./screenshot.png)
+## Screenshot v2.0.0
+![Snake Game](./screenshotv2.png)
 
 ## Tech Stack
 - **PixiJS v8** — WebGL 2D rendering engine
