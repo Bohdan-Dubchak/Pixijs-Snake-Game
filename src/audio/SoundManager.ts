@@ -1,7 +1,6 @@
 // SoundManager.ts
 // Відповідальність: завантажити звуки і надати простий API для їх відтворення
 // Інші класи не знають звідки звуки — просто викликають playEat(), playTick() і т.д.
-
 import { sound } from "@pixi/sound";
 
 export class SoundManager {
@@ -34,6 +33,7 @@ export class SoundManager {
         // щоб не було затримки при першому відтворенні
         this.loaded = true;
     }
+
     // Викликається ОДИН РАЗ при старті гри — не кожен тік
     // loop: true — звук грає нескінченно поки не зупинимо
     startGameLoop(): void {
@@ -55,7 +55,6 @@ export class SoundManager {
         // volume — гучність від 0 до 1
         sound.play('eat', { volume: 0.6 });
     }
-
 
     // Звук смерті
     playDeath(): void {
